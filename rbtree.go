@@ -1,16 +1,317 @@
 // Copyright © 2024 Mark Summerfield. All rights reserved.
-// License: GPL-3
-
 package rbtree
 
-import (
-    "fmt"
-    _ "embed"
-    )
+import "iter"
 
-//go:embed Version.dat
-var Version string
+// Comparable allows only string or integer keys.
+type Comparable interface {
+	~string | ~int | ~int8 | ~int16 | ~int32 | ~int64 |
+		~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr
+}
 
-func Hello() string {
-    return fmt.Sprintf("Hello rbtree v%s", Version)
+// RbTree zero value is usable. Create with statements like these:
+// var tree RbTree[string, int]
+// tree := RbTree[int, int]{}
+type RbTree[K Comparable, V any] struct {
+	root *node[K, V]
+	size int
+}
+
+type node[K Comparable, V any] struct {
+	key         K
+	value       V
+	red         bool
+	left, right *node[K, V]
+}
+
+// Insert inserts a new key-value into the Tree and returns true; or
+// replaces an existing key-value pair's value if the keys are equal and
+// returns false. For example:
+//
+//	ok := tree.Insert(key, value).
+func (me *RbTree[K, V]) Insert(key K, value V) bool {
+	inserted := false
+	me.root, inserted = me.insert(me.root, key, value)
+	me.root.red = false
+	if inserted {
+		me.size++
+	}
+	return inserted
+}
+
+func (me *RbTree[K, V]) insert(root *node[K, V], key K,
+	value V) (*node[K, V], bool) {
+	inserted := false
+	if root == nil { // If key was in the tree it would go here
+		return &node[K, V]{key: key, value: value, red: true},
+			true
+	}
+	if isRed(root.left) && isRed(root.right) {
+		colorFlip(root)
+	}
+	if key < root.key {
+		root.left, inserted = me.insert(root.left, key, value)
+	} else if root.key < key {
+		root.right, inserted = me.insert(root.right, key, value)
+	} else { // The key already in tree so just replace value
+		root.value = value
+	}
+	root = insertRotation(root)
+	return root, inserted
+}
+
+func isRed[K Comparable, V any](root *node[K, V]) bool {
+	return root != nil && root.red
+}
+
+func colorFlip[K Comparable, V any](root *node[K, V]) {
+	root.red = !root.red
+	if root.left != nil {
+		root.left.red = !root.left.red
+	}
+	if root.right != nil {
+		root.right.red = !root.right.red
+	}
+}
+
+func insertRotation[K Comparable, V any](
+	root *node[K, V]) *node[K, V] {
+	if isRed(root.right) && !isRed(root.left) {
+		root = rotateLeft(root)
+	}
+	if isRed(root.left) && isRed(root.left.left) {
+		root = rotateRight(root)
+	}
+	return root
+}
+
+func rotateLeft[K Comparable, V any](
+	root *node[K, V]) *node[K, V] {
+	x := root.right
+	root.right = x.left
+	x.left = root
+	x.red = root.red
+	root.red = true
+	return x
+}
+
+func rotateRight[K Comparable, V any](
+	root *node[K, V]) *node[K, V] {
+	x := root.left
+	root.left = x.right
+	x.right = root
+	x.red = root.red
+	root.red = true
+	return x
+}
+
+// Len returns the number of items in the tree.
+func (me *RbTree[K, V]) Len() int { return me.size }
+
+// All returns a for .. range iterable of the tree's keys
+// and values, e.g.,
+// for key, value := range tree.All()
+// See also [Keys] and [Values]
+func (me *RbTree[K, V]) All() iter.Seq2[K, V] {
+	return func(yield func(K, V) bool) {
+		all(me.root, yield)
+	}
+}
+
+func all[K Comparable, V any](root *node[K, V],
+	yield func(K, V) bool) {
+	if root != nil {
+		all(root.left, yield)
+		if !yield(root.key, root.value) {
+			return
+		}
+		all(root.right, yield)
+	}
+}
+
+// Keys returns a for .. range iterable of the tree's
+// keys, e.g.,
+// for key := range tree.Keys()
+// See also [All] and [Values]
+func (me *RbTree[K, V]) Keys() iter.Seq[K] {
+	return func(yield func(K) bool) {
+		keys(me.root, yield)
+	}
+}
+
+func keys[K Comparable, V any](root *node[K, V],
+	yield func(K) bool) {
+	if root != nil {
+		keys(root.left, yield)
+		if !yield(root.key) {
+			return
+		}
+		keys(root.right, yield)
+	}
+}
+
+// Values returns a for .. range iterable of the tree's
+// values, e.g.,
+// for value := range tree.Values()
+// See also [All] and [Keys]
+func (me *RbTree[K, V]) Values() iter.Seq[V] {
+	return func(yield func(V) bool) {
+		values(me.root, yield)
+	}
+}
+
+func values[K Comparable, V any](root *node[K, V],
+	yield func(V) bool) {
+	if root != nil {
+		values(root.left, yield)
+		if !yield(root.value) {
+			return
+		}
+		values(root.right, yield)
+	}
+}
+
+// Find returns the value and true if the key is in the Map
+// or nil and false otherwise. For example:
+//
+//	value, ok := myMap.Find(key).
+func (me *RbTree[K, V]) Find(key K) (V, bool) {
+	var value V
+	found := false
+	root := me.root
+	for root != nil {
+		if key < root.key {
+			root = root.left
+		} else if root.key < key {
+			root = root.right
+		} else {
+			return root.value, true
+		}
+	}
+	return value, found
+}
+
+// Delete deletes the key-value with the given key from the
+// Map and returns true, or does nothing and returns false if
+// there is no key-value with the given key. For example:
+//
+//	deleted := myMap.Delete(key).
+//
+// See also [Clear]
+func (me *RbTree[K, V]) Delete(key K) bool {
+	deleted := false
+	if me.root != nil {
+		if me.root, deleted = delete_(me.root,
+			key); me.root != nil {
+			me.root.red = false
+		}
+	}
+	if deleted {
+		me.size--
+	}
+	return deleted
+}
+
+func delete_[K Comparable, V any](root *node[K, V], key K) (
+	*node[K, V], bool) {
+	deleted := false
+	if key < root.key {
+		if root.left != nil {
+			if !isRed(root.left) && !isRed(root.left.left) {
+				root = moveRedLeft(root)
+			}
+			root.left, deleted = delete_(root.left, key)
+		}
+	} else {
+		if isRed(root.left) {
+			root = rotateRight(root)
+		}
+		if key == root.key && root.right == nil {
+			return nil, true
+		}
+		if root.right != nil {
+			root, deleted = deleteRight(root, key)
+		}
+	}
+	return fixUp(root), deleted
+}
+
+func moveRedLeft[K Comparable, V any](
+	root *node[K, V]) *node[K, V] {
+	colorFlip(root)
+	if root.right != nil && isRed(root.right.left) {
+		root.right = rotateRight(root.right)
+		root = rotateLeft(root)
+		colorFlip(root)
+	}
+	return root
+}
+
+func deleteRight[K Comparable, V any](root *node[K, V], key K) (
+	*node[K, V], bool) {
+	deleted := false
+	if !isRed(root.right) && !isRed(root.right.left) {
+		root = moveRedRight(root)
+	}
+	if key == root.key {
+		smallest := first(root.right)
+		root.key = smallest.key
+		root.value = smallest.value
+		root.right = deleteMinimum(root.right)
+		deleted = true
+	} else {
+		root.right, deleted = delete_(root.right, key)
+	}
+	return root, deleted
+}
+
+func moveRedRight[K Comparable, V any](
+	root *node[K, V]) *node[K, V] {
+	colorFlip(root)
+	if root.left != nil && isRed(root.left.left) {
+		root = rotateRight(root)
+		colorFlip(root)
+	}
+	return root
+}
+
+// We do not provide an exported First() method because this
+// is an implementation detail.
+func first[K Comparable, V any](root *node[K, V]) *node[K, V] {
+	for root.left != nil {
+		root = root.left
+	}
+	return root
+}
+
+func deleteMinimum[K Comparable, V any](
+	root *node[K, V]) *node[K, V] {
+	if root.left == nil {
+		return nil
+	}
+	if !isRed(root.left) && !isRed(root.left.left) {
+		root = moveRedLeft(root)
+	}
+	root.left = deleteMinimum(root.left)
+	return fixUp(root)
+}
+
+func fixUp[K Comparable, V any](root *node[K, V]) *node[K, V] {
+	if isRed(root.right) {
+		root = rotateLeft(root)
+	}
+	if isRed(root.left) && isRed(root.left.left) {
+		root = rotateRight(root)
+	}
+	if isRed(root.left) && isRed(root.right) {
+		colorFlip(root)
+	}
+	return root
+}
+
+// Clear deletes the entire tree.
+// See also [Delete]
+func (me *RbTree[K, V]) Clear() {
+	me.root = nil
+	me.size = 0
 }
