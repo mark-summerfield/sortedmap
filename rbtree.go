@@ -171,10 +171,10 @@ func values[K Comparable, V any](root *node[K, V],
 	}
 }
 
-// Find returns the value and true if the key is in the Map
+// Find returns the value and true if the key is in the tree
 // or nil and false otherwise. For example:
 //
-//	value, ok := myMap.Find(key).
+//	value, ok := tree.Find(key).
 func (me *RbTree[K, V]) Find(key K) (V, bool) {
 	var value V
 	found := false
@@ -192,10 +192,10 @@ func (me *RbTree[K, V]) Find(key K) (V, bool) {
 }
 
 // Delete deletes the key-value with the given key from the
-// Map and returns true, or does nothing and returns false if
+// tree and returns true, or does nothing and returns false if
 // there is no key-value with the given key. For example:
 //
-//	deleted := myMap.Delete(key).
+//	deleted := tree.Delete(key).
 //
 // See also [Clear]
 func (me *RbTree[K, V]) Delete(key K) bool {
