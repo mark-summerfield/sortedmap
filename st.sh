@@ -1,5 +1,5 @@
 #!/bin/bash
-clc -s -e rbtree_test.go
+clc -s
 cat Version.dat
 go mod tidy
 go fmt .
