@@ -44,7 +44,6 @@ func (me *RbTree[K, V]) Insert(key K, value V) bool {
 
 func (me *RbTree[K, V]) insert(root *node[K, V], key K,
 	value V) (*node[K, V], bool) {
-	inserted := false
 	if root == nil { // If key was present it would go here
 		return &node[K, V]{key: key, value: value, red: true},
 			true
@@ -52,6 +51,7 @@ func (me *RbTree[K, V]) insert(root *node[K, V], key K,
 	if isRed(root.left) && isRed(root.right) {
 		colorFlip(root)
 	}
+	inserted := false
 	if key < root.key {
 		root.left, inserted = me.insert(root.left, key, value)
 	} else if root.key < key {
