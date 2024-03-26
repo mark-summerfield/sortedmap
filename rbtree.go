@@ -1,4 +1,5 @@
 // Copyright © 2024 Mark Summerfield. All rights reserved.
+// tag::all[]
 package rbtree
 
 import "iter"
@@ -9,9 +10,11 @@ type Comparable interface {
 		~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr
 }
 
-// RbTree zero value is usable. Create with statements like these:
-// var tree RbTree[string, int]
-// tree := RbTree[int, int]{}
+// An RbTree zero value is usable.
+// Create it with statements like these:
+//
+//	var tree RbTree[string, int]
+//	tree := RbTree[int, int]{}
 type RbTree[K Comparable, V any] struct {
 	root *node[K, V]
 	size int
@@ -24,9 +27,9 @@ type node[K Comparable, V any] struct {
 	left, right *node[K, V]
 }
 
-// Insert inserts a new key-value into the Tree and returns true; or
-// replaces an existing key-value pair's value if the keys are equal and
-// returns false. For example:
+// Insert inserts a new key-value item into the tree and
+// returns true; or replaces an existing key-value pair’s
+// value if the keys are equal and returns false. For example:
 //
 //	ok := tree.Insert(key, value).
 func (me *RbTree[K, V]) Insert(key K, value V) bool {
@@ -108,9 +111,11 @@ func rotateRight[K Comparable, V any](
 // Len returns the number of items in the tree.
 func (me *RbTree[K, V]) Len() int { return me.size }
 
-// All returns a for .. range iterable of the tree's keys
-// and values, e.g.,
-// for key, value := range tree.All()
+// All returns a for … range iterable (a range function)
+// of the tree’s keys and values, e.g.,
+//
+//	for key, value := range tree.All()
+//
 // See also [Keys] and [Values]
 func (me *RbTree[K, V]) All() iter.Seq2[K, V] {
 	return func(yield func(K, V) bool) {
@@ -129,9 +134,11 @@ func all[K Comparable, V any](root *node[K, V],
 	}
 }
 
-// Keys returns a for .. range iterable of the tree's
-// keys, e.g.,
-// for key := range tree.Keys()
+// Keys returns a for … range iterable (a range function)
+// of the tree’s keys, e.g.,
+//
+//	for key := range tree.Keys()
+//
 // See also [All] and [Values]
 func (me *RbTree[K, V]) Keys() iter.Seq[K] {
 	return func(yield func(K) bool) {
@@ -150,9 +157,11 @@ func keys[K Comparable, V any](root *node[K, V],
 	}
 }
 
-// Values returns a for .. range iterable of the tree's
-// values, e.g.,
-// for value := range tree.Values()
+// Values returns a for … range iterable (a range function)
+// of the tree’s values, e.g.,
+//
+//	for value := range tree.Values()
+//
 // See also [All] and [Keys]
 func (me *RbTree[K, V]) Values() iter.Seq[V] {
 	return func(yield func(V) bool) {
@@ -172,9 +181,13 @@ func values[K Comparable, V any](root *node[K, V],
 }
 
 // Find returns the value and true if the key is in the tree
-// or nil and false otherwise. For example:
+// or V’s zero value and false otherwise. For example:
 //
-//	value, ok := tree.Find(key).
+//	value, ok := tree.Find(key)
+//
+// For “contains”, use:
+//
+//	_, ok := tree.Find(key)
 func (me *RbTree[K, V]) Find(key K) (V, bool) {
 	var value V
 	found := false
@@ -191,11 +204,11 @@ func (me *RbTree[K, V]) Find(key K) (V, bool) {
 	return value, found
 }
 
-// Delete deletes the key-value with the given key from the
+// Delete deletes the key-value item with the given key from the
 // tree and returns true, or does nothing and returns false if
 // there is no key-value with the given key. For example:
 //
-//	deleted := tree.Delete(key).
+//	ok := tree.Delete(key).
 //
 // See also [Clear]
 func (me *RbTree[K, V]) Delete(key K) bool {
@@ -309,9 +322,11 @@ func fixUp[K Comparable, V any](root *node[K, V]) *node[K, V] {
 	return root
 }
 
-// Clear deletes the entire tree.
+// Clear deletes all the tree’s key-value items.
 // See also [Delete]
 func (me *RbTree[K, V]) Clear() {
 	me.root = nil
 	me.size = 0
 }
+
+//end::all[]
