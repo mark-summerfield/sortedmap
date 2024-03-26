@@ -33,34 +33,29 @@ type node[K Comparable, V any] struct {
 //
 //	ok := tree.Insert(key, value).
 func (me *RbTree[K, V]) Insert(key K, value V) bool {
-	inserted := false
-	me.root, inserted = me.insert(me.root, key, value)
+	size := me.size
+	me.root = me.insert(me.root, key, value)
 	me.root.red = false
-	if inserted {
-		me.size++
-	}
-	return inserted
+	return size == me.size
 }
 
 func (me *RbTree[K, V]) insert(root *node[K, V], key K,
-	value V) (*node[K, V], bool) {
+	value V) *node[K, V] {
 	if root == nil { // If key was present it would go here
-		return &node[K, V]{key: key, value: value, red: true},
-			true
+		me.size++
+		return &node[K, V]{key: key, value: value, red: true}
 	}
 	if isRed(root.left) && isRed(root.right) {
 		colorFlip(root)
 	}
-	inserted := false
 	if key < root.key {
-		root.left, inserted = me.insert(root.left, key, value)
+		root.left = me.insert(root.left, key, value)
 	} else if root.key < key {
-		root.right, inserted = me.insert(root.right, key, value)
+		root.right = me.insert(root.right, key, value)
 	} else { // Key already in tree so just replace value
 		root.value = value
 	}
-	root = insertRotation(root)
-	return root, inserted
+	return insertRotation(root)
 }
 
 func isRed[K Comparable, V any](root *node[K, V]) bool {
