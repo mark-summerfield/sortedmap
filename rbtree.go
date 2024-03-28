@@ -50,7 +50,7 @@ func (me *RbTree[K, V]) insert(root *node[K, V], key K,
 	}
 	if key < root.key {
 		root.left = me.insert(root.left, key, value)
-	} else if root.key < key {
+	} else if key > root.key {
 		root.right = me.insert(root.right, key, value)
 	} else { // Key already in tree so just replace value
 		root.value = value
@@ -185,18 +185,17 @@ func values[K Comparable, V any](root *node[K, V],
 //	_, ok := tree.Find(key)
 func (me *RbTree[K, V]) Find(key K) (V, bool) {
 	var value V
-	found := false
 	root := me.root
 	for root != nil {
 		if key < root.key {
 			root = root.left
-		} else if root.key < key {
+		} else if key > root.key {
 			root = root.right
 		} else {
 			return root.value, true
 		}
 	}
-	return value, found
+	return value, false
 }
 
 // Delete deletes the key-value item with the given key from the
