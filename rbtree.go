@@ -184,7 +184,7 @@ func values[K Comparable, V any](root *node[K, V],
 //
 //	_, ok := tree.Find(key)
 func (me *RbTree[K, V]) Find(key K) (V, bool) {
-	var value V
+	var zero V
 	root := me.root
 	for root != nil {
 		if key < root.key {
@@ -195,7 +195,7 @@ func (me *RbTree[K, V]) Find(key K) (V, bool) {
 			return root.value, true
 		}
 	}
-	return value, false
+	return zero, false
 }
 
 // Delete deletes the key-value item with the given key from the
