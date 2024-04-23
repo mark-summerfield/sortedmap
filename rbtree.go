@@ -121,15 +121,9 @@ func (me *RbTree[K, V]) All() iter.Seq2[K, V] {
 func all[K Comparable, V any](root *node[K, V],
 	yield func(K, V) bool) bool {
 	if root != nil {
-		if !all(root.left, yield) {
-			return false
-		}
-		if !yield(root.key, root.value) {
-			return false
-		}
-		if !all(root.right, yield) {
-			return false
-		}
+		return all(root.left, yield) &&
+			yield(root.key, root.value) &&
+			all(root.right, yield)
 	}
 	return true
 }
@@ -149,15 +143,9 @@ func (me *RbTree[K, V]) Keys() iter.Seq[K] {
 func keys[K Comparable, V any](root *node[K, V],
 	yield func(K) bool) bool {
 	if root != nil {
-		if !keys(root.left, yield) {
-			return false
-		}
-		if !yield(root.key) {
-			return false
-		}
-		if !keys(root.right, yield) {
-			return false
-		}
+		return keys(root.left, yield) &&
+			yield(root.key) &&
+			keys(root.right, yield)
 	}
 	return true
 }
@@ -177,15 +165,9 @@ func (me *RbTree[K, V]) Values() iter.Seq[V] {
 func values[K Comparable, V any](root *node[K, V],
 	yield func(V) bool) bool {
 	if root != nil {
-		if !values(root.left, yield) {
-			return false
-		}
-		if !yield(root.value) {
-			return false
-		}
-		if !values(root.right, yield) {
-			return false
-		}
+		return values(root.left, yield) &&
+			yield(root.value) &&
+			values(root.right, yield)
 	}
 	return true
 }
