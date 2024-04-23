@@ -4,6 +4,7 @@ package rbtree
 import (
 	"fmt"
 	"slices"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -286,5 +287,55 @@ func BenchmarkBTreeIteration(b *testing.B) {
 	b.StopTimer() // Don't time check
 	if total != 499999500000 {
 		panic(total)
+	}
+}
+func Test_DeleteValue(t *testing.T) {
+	var tree RbTree[int, string]
+	for _, n := range []int{9, 1, 8, 2, 7, 3, 6, 4, 5, 0} {
+		tree.Insert(n, strconv.Itoa(n))
+	}
+	for key, value := range tree.All() {
+		k := strconv.Itoa(key)
+		if k != value {
+			t.Errorf("expected [%d]=%q; got %q", key, k, value)
+		}
+	}
+	if tree.Len() != 10 {
+		t.Errorf("Len expected 10; got %d", tree.Len())
+	}
+	tree.Delete(99)
+	if tree.Len() != 10 {
+		t.Errorf("Len expected 10; got %d", tree.Len())
+	}
+	for _, i := range []int{6, 9, 3, 1} {
+		tree.Delete(i)
+	}
+	if tree.Len() != 6 {
+		t.Errorf("Len expected 6; got %d", tree.Len())
+	}
+	for key, value := range tree.All() {
+		k := strconv.Itoa(key)
+		if k != value {
+			t.Errorf("expected [%d]=%q; got %q", key, k, value)
+		}
+	}
+	for key, value := range tree.All() {
+		if key == 5 {
+			break
+		}
+		k := strconv.Itoa(key)
+		if k != value {
+			t.Errorf("expected [%d]=%q; got %q", key, k, value)
+		}
+	}
+	for key := range tree.Keys() {
+		if key == 5 {
+			break
+		}
+	}
+	for value := range tree.Values() {
+		if value == "5" {
+			break
+		}
 	}
 }

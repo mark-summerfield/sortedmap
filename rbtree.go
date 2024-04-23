@@ -119,14 +119,19 @@ func (me *RbTree[K, V]) All() iter.Seq2[K, V] {
 }
 
 func all[K Comparable, V any](root *node[K, V],
-	yield func(K, V) bool) {
+	yield func(K, V) bool) bool {
 	if root != nil {
-		all(root.left, yield)
-		if !yield(root.key, root.value) {
-			return
+		if !all(root.left, yield) {
+			return false
 		}
-		all(root.right, yield)
+		if !yield(root.key, root.value) {
+			return false
+		}
+		if !all(root.right, yield) {
+			return false
+		}
 	}
+	return true
 }
 
 // Keys returns a for … range iterable (a range function)
@@ -142,14 +147,19 @@ func (me *RbTree[K, V]) Keys() iter.Seq[K] {
 }
 
 func keys[K Comparable, V any](root *node[K, V],
-	yield func(K) bool) {
+	yield func(K) bool) bool {
 	if root != nil {
-		keys(root.left, yield)
-		if !yield(root.key) {
-			return
+		if !keys(root.left, yield) {
+			return false
 		}
-		keys(root.right, yield)
+		if !yield(root.key) {
+			return false
+		}
+		if !keys(root.right, yield) {
+			return false
+		}
 	}
+	return true
 }
 
 // Values returns a for … range iterable (a range function)
@@ -165,14 +175,19 @@ func (me *RbTree[K, V]) Values() iter.Seq[V] {
 }
 
 func values[K Comparable, V any](root *node[K, V],
-	yield func(V) bool) {
+	yield func(V) bool) bool {
 	if root != nil {
-		values(root.left, yield)
-		if !yield(root.value) {
-			return
+		if !values(root.left, yield) {
+			return false
 		}
-		values(root.right, yield)
+		if !yield(root.value) {
+			return false
+		}
+		if !values(root.right, yield) {
+			return false
+		}
 	}
+	return true
 }
 
 // Find returns the value and true if the key is in the tree
