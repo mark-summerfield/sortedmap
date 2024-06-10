@@ -106,8 +106,9 @@ func rotateRight[K Comparable, V any](
 // Len returns the number of items in the tree.
 func (me *RbTree[K, V]) Len() int { return me.size }
 
-// All returns a for … range iterable (a range function)
-// of the tree’s keys and values, e.g.,
+// All is a range function for use as an iterable in a
+// for … range loop that returns all of the tree’s
+// keys and values, e.g.,
 //
 //	for key, value := range tree.All()
 //
@@ -128,8 +129,8 @@ func all[K Comparable, V any](root *node[K, V],
 	return true
 }
 
-// Keys returns a for … range iterable (a range function)
-// of the tree’s keys, e.g.,
+// Keys is a range function for use as an iterable in a
+// for … range loop that returns all of the tree’s keys:
 //
 //	for key := range tree.Keys()
 //
@@ -150,8 +151,8 @@ func keys[K Comparable, V any](root *node[K, V],
 	return true
 }
 
-// Values returns a for … range iterable (a range function)
-// of the tree’s values, e.g.,
+// Values is a range function for use as an iterable in a
+// for … range loop that returns all of the tree’s values:
 //
 //	for value := range tree.Values()
 //
