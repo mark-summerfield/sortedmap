@@ -175,14 +175,16 @@ func values[K Comparable, V any](root *node[K, V],
 	return true
 }
 
+// Contains returns true if the key is in the tree and false otherwise.
+func (me *RbTree[K, V]) Contains(key K) bool {
+	_, found := me.Find(key)
+	return found
+}
+
 // Find returns the value and true if the key is in the tree
 // or V’s zero value and false otherwise. For example:
 //
 //	value, ok := tree.Find(key)
-//
-// For “contains”, use:
-//
-//	_, ok := tree.Find(key)
 func (me *RbTree[K, V]) Find(key K) (V, bool) {
 	var zero V
 	root := me.root
