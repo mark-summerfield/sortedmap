@@ -1,5 +1,7 @@
 // Copyright © 2024 Mark Summerfield. All rights reserved.
-// tag::all[]
+
+// This package provides a generic red-black tree implementation. It is in
+// effect a < ordered key-value map.
 package rbtree
 
 import "iter"
@@ -320,5 +322,3 @@ func (me *RbTree[K, V]) Clear() {
 	me.root = nil
 	me.size = 0
 }
-
-//end::all[]
