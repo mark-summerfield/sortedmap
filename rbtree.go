@@ -236,6 +236,7 @@ func delete_[K Comparable, V any](root *node[K, V], key K) (
 			root = rotateRight(root)
 		}
 		if key == root.key && root.right == nil {
+			// free(root)
 			return nil, true
 		}
 		if root.right != nil {
@@ -296,6 +297,7 @@ func first[K Comparable, V any](root *node[K, V]) *node[K, V] {
 func deleteMinimum[K Comparable, V any](
 	root *node[K, V]) *node[K, V] {
 	if root.left == nil {
+		// free(root)
 		return nil
 	}
 	if !isRed(root.left) && !isRed(root.left.left) {

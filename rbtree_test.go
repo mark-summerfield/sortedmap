@@ -32,6 +32,9 @@ func TestAPI(t *testing.T) {
 	size := tree.Len()          // 7
 	value, ok := tree.Find('Y') // garbage, false
 	//end::api2[]
+	if size != 7 {
+		t.Errorf("expected size 7; got %d (%d)", size, value)
+	}
 	if ok {
 		t.Error("expected false; got true")
 	}
@@ -45,6 +48,9 @@ func TestAPI(t *testing.T) {
 	//tag::api4[]
 	deleted := tree.Delete('Y') // false
 	//end::api4[]
+	if size != 7 {
+		t.Errorf("expected size 7; got %d", size)
+	}
 	if deleted {
 		t.Error("expected false; got true")
 	}

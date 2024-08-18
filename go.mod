@@ -1,3 +1,3 @@
 module github.com/mark-summerfield/rbtree
 
-go 1.22.0
+go 1.23.0
