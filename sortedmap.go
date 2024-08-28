@@ -2,7 +2,7 @@
 
 // This package provides a generic red-black tree implementation. It is in
 // effect a < ordered key-value map.
-package rbtree
+package sortedmap
 
 import "iter"
 
@@ -12,12 +12,12 @@ type Comparable interface {
 		~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr
 }
 
-// An RbTree zero value is usable.
+// An SortedMap zero value is usable.
 // Create it with statements like these:
 //
-//	var tree RbTree[string, int]
-//	tree := RbTree[int, int]{}
-type RbTree[K Comparable, V any] struct {
+//	var tree SortedMap[string, int]
+//	tree := SortedMap[int, int]{}
+type SortedMap[K Comparable, V any] struct {
 	root *node[K, V]
 	size int
 }
@@ -34,14 +34,14 @@ type node[K Comparable, V any] struct {
 // value if the keys are equal and returns false. For example:
 //
 //	ok := tree.Insert(key, value).
-func (me *RbTree[K, V]) Insert(key K, value V) bool {
+func (me *SortedMap[K, V]) Insert(key K, value V) bool {
 	size := me.size
 	me.root = me.insert(me.root, key, value)
 	me.root.red = false
 	return size == me.size
 }
 
-func (me *RbTree[K, V]) insert(root *node[K, V], key K,
+func (me *SortedMap[K, V]) insert(root *node[K, V], key K,
 	value V) *node[K, V] {
 	if root == nil { // If key was present it would go here
 		me.size++
@@ -106,7 +106,7 @@ func rotateRight[K Comparable, V any](
 }
 
 // Len returns the number of items in the tree.
-func (me *RbTree[K, V]) Len() int { return me.size }
+func (me *SortedMap[K, V]) Len() int { return me.size }
 
 // All is a range function for use as an iterable in a
 // for … range loop that returns all of the tree’s
@@ -115,7 +115,7 @@ func (me *RbTree[K, V]) Len() int { return me.size }
 //	for key, value := range tree.All()
 //
 // See also [Keys] and [Values]
-func (me *RbTree[K, V]) All() iter.Seq2[K, V] {
+func (me *SortedMap[K, V]) All() iter.Seq2[K, V] {
 	return func(yield func(K, V) bool) {
 		all(me.root, yield)
 	}
@@ -137,7 +137,7 @@ func all[K Comparable, V any](root *node[K, V],
 //	for key := range tree.Keys()
 //
 // See also [All] and [Values]
-func (me *RbTree[K, V]) Keys() iter.Seq[K] {
+func (me *SortedMap[K, V]) Keys() iter.Seq[K] {
 	return func(yield func(K) bool) {
 		keys(me.root, yield)
 	}
@@ -159,7 +159,7 @@ func keys[K Comparable, V any](root *node[K, V],
 //	for value := range tree.Values()
 //
 // See also [All] and [Keys]
-func (me *RbTree[K, V]) Values() iter.Seq[V] {
+func (me *SortedMap[K, V]) Values() iter.Seq[V] {
 	return func(yield func(V) bool) {
 		values(me.root, yield)
 	}
@@ -176,7 +176,7 @@ func values[K Comparable, V any](root *node[K, V],
 }
 
 // Contains returns true if the key is in the tree and false otherwise.
-func (me *RbTree[K, V]) Contains(key K) bool {
+func (me *SortedMap[K, V]) Contains(key K) bool {
 	_, found := me.Find(key)
 	return found
 }
@@ -185,7 +185,7 @@ func (me *RbTree[K, V]) Contains(key K) bool {
 // or V’s zero value and false otherwise. For example:
 //
 //	value, ok := tree.Find(key)
-func (me *RbTree[K, V]) Find(key K) (V, bool) {
+func (me *SortedMap[K, V]) Find(key K) (V, bool) {
 	var zero V
 	root := me.root
 	for root != nil {
@@ -207,7 +207,7 @@ func (me *RbTree[K, V]) Find(key K) (V, bool) {
 //	ok := tree.Delete(key).
 //
 // See also [Clear]
-func (me *RbTree[K, V]) Delete(key K) bool {
+func (me *SortedMap[K, V]) Delete(key K) bool {
 	deleted := false
 	if me.root != nil {
 		if me.root, deleted = delete_(me.root,
@@ -322,7 +322,7 @@ func fixUp[K Comparable, V any](root *node[K, V]) *node[K, V] {
 
 // Clear deletes all the tree’s key-value items.
 // See also [Delete]
-func (me *RbTree[K, V]) Clear() {
+func (me *SortedMap[K, V]) Clear() {
 	me.root = nil
 	me.size = 0
 }

@@ -1,6 +1,6 @@
-rbtree.go
+sortedmap.go
 
-rbtree_test.go
+sortedmap_test.go
 
 README.md
 

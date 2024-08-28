@@ -1,3 +1,3 @@
-module github.com/mark-summerfield/rbtree
+module github.com/mark-summerfield/sortedmap
 
 go 1.23.0

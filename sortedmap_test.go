@@ -1,5 +1,5 @@
 // Copyright © 2024 Mark Summerfield. All rights reserved.
-package rbtree
+package sortedmap
 
 import (
 	"fmt"
@@ -13,7 +13,7 @@ func TestAPI(t *testing.T) {
 	//tag::api1[]
 	//                 012345678
 	letters := []rune("ZENZEBRAS")
-	tree := RbTree[rune, int]{}
+	tree := SortedMap[rune, int]{}
 	for i, letter := range letters {
 		tree.Insert(letter, i)
 	}
@@ -92,7 +92,7 @@ func Test1(t *testing.T) {
 	}
 	expected := []string{"a", "be", "can", "dent", "ebony", "for", "go",
 		"in"}
-	var tree RbTree[string, int] // <1>
+	var tree SortedMap[string, int] // <1>
 	for _, datum := range data {
 		tree.Insert(datum.S, datum.I)
 	}
@@ -117,7 +117,7 @@ func Test2(t *testing.T) {
 		{3, 3}, {8, 8}, {1, 1}, {5, 5}, {7, 7}, {2, 2}, {4, 4}, {6, 6},
 	}
 	expected := []int{1, 2, 3, 4, 5, 6, 7, 8}
-	tree := RbTree[int, int]{} // <1>
+	tree := SortedMap[int, int]{} // <1>
 	for _, datum := range data {
 		tree.Insert(datum.K, datum.V)
 	}
@@ -138,7 +138,7 @@ func Test2(t *testing.T) {
 }
 
 func TestStringKeyInsertion(t *testing.T) {
-	var wordForWord RbTree[string, string]
+	var wordForWord SortedMap[string, string]
 	for _, word := range []string{"one", "Two", "THREE", "four", "Five"} {
 		wordForWord.Insert(strings.ToLower(word), word)
 	}
@@ -153,7 +153,7 @@ func TestStringKeyInsertion(t *testing.T) {
 }
 
 func TestIntKeyFind(t *testing.T) {
-	var intMap RbTree[int, int]
+	var intMap SortedMap[int, int]
 	for _, number := range []int{9, 1, 8, 2, 7, 3, 6, 4, 5, 0} {
 		intMap.Insert(number, number*10)
 	}
@@ -176,7 +176,7 @@ func TestIntKeyFind(t *testing.T) {
 }
 
 func TestIntKeyDelete(t *testing.T) {
-	var intMap RbTree[int, int]
+	var intMap SortedMap[int, int]
 	for _, number := range []int{9, 1, 8, 2, 7, 3, 6, 4, 5, 0} {
 		intMap.Insert(number, number*10)
 	}
@@ -203,12 +203,12 @@ func TestIntKeyDelete(t *testing.T) {
 }
 
 func TestPassing(t *testing.T) {
-	var intMap RbTree[int, int]
+	var intMap SortedMap[int, int]
 	intMap.Insert(7, 7)
 	passTree(&intMap, t)
 }
 
-func passTree(tree *RbTree[int, int], t *testing.T) {
+func passTree(tree *SortedMap[int, int], t *testing.T) {
 	for _, number := range []int{9, 3, 6, 4, 5, 0} {
 		tree.Insert(number, number)
 	}
@@ -220,7 +220,7 @@ func passTree(tree *RbTree[int, int], t *testing.T) {
 // Thanks to Russ Cox for improving these benchmarks
 func BenchmarkFindSuccess(b *testing.B) {
 	b.StopTimer() // Don't time creation and population
-	var intMap RbTree[int, int]
+	var intMap SortedMap[int, int]
 	for i := range 1000000 {
 		intMap.Insert(i, i)
 	}
@@ -232,7 +232,7 @@ func BenchmarkFindSuccess(b *testing.B) {
 
 func BenchmarkFindFailure(b *testing.B) {
 	b.StopTimer() // Don't time creation and population
-	intMap := RbTree[int, int]{}
+	intMap := SortedMap[int, int]{}
 	for i := range 1000000 {
 		intMap.Insert(2*i, i)
 	}
@@ -273,7 +273,7 @@ func BenchmarkMapSortedIteration(b *testing.B) {
 }
 
 func BenchmarkBTreeInsertion(b *testing.B) {
-	var m RbTree[int, int]
+	var m SortedMap[int, int]
 	for i := range 1000000 {
 		m.Insert(i, i)
 	}
@@ -281,7 +281,7 @@ func BenchmarkBTreeInsertion(b *testing.B) {
 
 func BenchmarkBTreeIteration(b *testing.B) {
 	b.StopTimer() // Don't time creation and population
-	var m RbTree[int, int]
+	var m SortedMap[int, int]
 	for i := range 1000000 {
 		m.Insert(i, i)
 	}
@@ -296,7 +296,7 @@ func BenchmarkBTreeIteration(b *testing.B) {
 	}
 }
 func Test_DeleteValue(t *testing.T) {
-	var tree RbTree[int, string]
+	var tree SortedMap[int, string]
 	for _, n := range []int{9, 1, 8, 2, 7, 3, 6, 4, 5, 0} {
 		tree.Insert(n, strconv.Itoa(n))
 	}
