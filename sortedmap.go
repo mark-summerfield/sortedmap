@@ -1,7 +1,7 @@
 // Copyright © 2024 Mark Summerfield. All rights reserved.
 
-// This package provides a generic red-black tree implementation. It is in
-// effect a < ordered key-value map. ([TOC])
+// ([TOC]) This package provides a generic red-black tree implementation. It
+// is in effect a < ordered key-value map.
 //
 // [TOC]: file:///home/mark/app/golib/doc/index.html
 package sortedmap
