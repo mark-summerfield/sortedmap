@@ -1,4 +1,4 @@
-// Copyright © 2024 Mark Summerfield. All rights reserved.
+// Copyright © 2024-25 Mark Summerfield. All rights reserved.
 
 // ([TOC]) This package provides a generic red-black tree implementation. It
 // is in effect a < ordered key-value map.

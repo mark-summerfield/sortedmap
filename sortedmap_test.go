@@ -1,4 +1,4 @@
-// Copyright © 2024 Mark Summerfield. All rights reserved.
+// Copyright © 2024-25 Mark Summerfield. All rights reserved.
 package sortedmap
 
 import (
