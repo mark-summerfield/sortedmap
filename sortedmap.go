@@ -6,13 +6,13 @@
 // [TOC]: file:///home/mark/app/golib/doc/index.html
 package sortedmap
 
-import "iter"
+import (
+	"iter"
 
-// Comparable allows only string or integer keys.
-type Comparable interface {
-	~string | ~int | ~int8 | ~int16 | ~int32 | ~int64 |
-		~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr
-}
+	"github.com/mark-summerfield/unum"
+)
+
+type Comparable = unum.Comparable
 
 // An SortedMap zero value is usable.
 // Create it with statements like these:
@@ -44,7 +44,8 @@ func (me *SortedMap[K, V]) Insert(key K, value V) bool {
 }
 
 func (me *SortedMap[K, V]) insert(root *node[K, V], key K,
-	value V) *node[K, V] {
+	value V,
+) *node[K, V] {
 	if root == nil { // If key was present it would go here
 		me.size++
 		return &node[K, V]{key: key, value: value, red: true}
@@ -77,7 +78,8 @@ func colorFlip[K Comparable, V any](root *node[K, V]) {
 }
 
 func insertRotation[K Comparable, V any](
-	root *node[K, V]) *node[K, V] {
+	root *node[K, V],
+) *node[K, V] {
 	if isRed(root.right) && !isRed(root.left) {
 		root = rotateLeft(root)
 	}
@@ -88,7 +90,8 @@ func insertRotation[K Comparable, V any](
 }
 
 func rotateLeft[K Comparable, V any](
-	root *node[K, V]) *node[K, V] {
+	root *node[K, V],
+) *node[K, V] {
 	x := root.right
 	root.right = x.left
 	x.left = root
@@ -98,7 +101,8 @@ func rotateLeft[K Comparable, V any](
 }
 
 func rotateRight[K Comparable, V any](
-	root *node[K, V]) *node[K, V] {
+	root *node[K, V],
+) *node[K, V] {
 	x := root.left
 	root.left = x.right
 	x.right = root
@@ -124,7 +128,8 @@ func (me *SortedMap[K, V]) All() iter.Seq2[K, V] {
 }
 
 func all[K Comparable, V any](root *node[K, V],
-	yield func(K, V) bool) bool {
+	yield func(K, V) bool,
+) bool {
 	if root != nil {
 		return all(root.left, yield) &&
 			yield(root.key, root.value) &&
@@ -146,7 +151,8 @@ func (me *SortedMap[K, V]) Keys() iter.Seq[K] {
 }
 
 func keys[K Comparable, V any](root *node[K, V],
-	yield func(K) bool) bool {
+	yield func(K) bool,
+) bool {
 	if root != nil {
 		return keys(root.left, yield) &&
 			yield(root.key) &&
@@ -168,7 +174,8 @@ func (me *SortedMap[K, V]) Values() iter.Seq[V] {
 }
 
 func values[K Comparable, V any](root *node[K, V],
-	yield func(V) bool) bool {
+	yield func(V) bool,
+) bool {
 	if root != nil {
 		return values(root.left, yield) &&
 			yield(root.value) &&
@@ -224,7 +231,8 @@ func (me *SortedMap[K, V]) Delete(key K) bool {
 }
 
 func delete_[K Comparable, V any](root *node[K, V], key K) (
-	*node[K, V], bool) {
+	*node[K, V], bool,
+) {
 	deleted := false
 	if key < root.key {
 		if root.left != nil {
@@ -249,7 +257,8 @@ func delete_[K Comparable, V any](root *node[K, V], key K) (
 }
 
 func moveRedLeft[K Comparable, V any](
-	root *node[K, V]) *node[K, V] {
+	root *node[K, V],
+) *node[K, V] {
 	colorFlip(root)
 	if root.right != nil && isRed(root.right.left) {
 		root.right = rotateRight(root.right)
@@ -260,7 +269,8 @@ func moveRedLeft[K Comparable, V any](
 }
 
 func deleteRight[K Comparable, V any](root *node[K, V], key K) (
-	*node[K, V], bool) {
+	*node[K, V], bool,
+) {
 	deleted := false
 	if !isRed(root.right) && !isRed(root.right.left) {
 		root = moveRedRight(root)
@@ -278,7 +288,8 @@ func deleteRight[K Comparable, V any](root *node[K, V], key K) (
 }
 
 func moveRedRight[K Comparable, V any](
-	root *node[K, V]) *node[K, V] {
+	root *node[K, V],
+) *node[K, V] {
 	colorFlip(root)
 	if root.left != nil && isRed(root.left.left) {
 		root = rotateRight(root)
@@ -297,7 +308,8 @@ func first[K Comparable, V any](root *node[K, V]) *node[K, V] {
 }
 
 func deleteMinimum[K Comparable, V any](
-	root *node[K, V]) *node[K, V] {
+	root *node[K, V],
+) *node[K, V] {
 	if root.left == nil {
 		// free(root)
 		return nil

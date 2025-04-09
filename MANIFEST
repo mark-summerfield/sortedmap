@@ -2,6 +2,8 @@ sortedmap.go
 
 sortedmap_test.go
 
+go.mod
+
 README.md
 
 st.sh
