@@ -1,8 +1,8 @@
 # sortedmap
 
 
-This package provides a generic red-black tree implementation. It
-is in effect a `<` ordered key-value map.
+This package provides a generic sorted map (i.e., a `<` ordered key-value
+map) based on a red-black tree.
 
 ## License
 
