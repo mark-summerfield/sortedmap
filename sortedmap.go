@@ -138,6 +138,20 @@ func all[K Comparable, V any](root *node[K, V],
 	return true
 }
 
+// Equal returns true if this SortedSet has the same elements as the other
+// SortedMap; otherwise returns false.
+func (me *SortedMap[K, V]) Equal(other SortedMap[K, V]) bool {
+	if me.Len() != other.Len() {
+		return false
+	}
+	for element := range me.All() {
+		if !other.Contains(element) {
+			return false
+		}
+	}
+	return true
+}
+
 // Keys is a range function for use as an iterable in a
 // for … range loop that returns all of the tree’s keys:
 //

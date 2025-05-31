@@ -10,7 +10,7 @@ import (
 )
 
 func TestAPI(t *testing.T) {
-	//tag::api1[]
+	// tag::api1[]
 	//                 012345678
 	letters := []rune("ZENZEBRAS")
 	tree := SortedMap[rune, int]{}
@@ -23,40 +23,40 @@ func TestAPI(t *testing.T) {
 	}
 	text := strings.TrimSpace(out.String())
 	// text: A:7 B:5 E:4 N:2 R:6 S:8 Z:3
-	//end::api1[]
+	// end::api1[]
 	expected := "A:7 B:5 E:4 N:2 R:6 S:8 Z:3"
 	if expected != text {
 		t.Errorf("expected %q; got %q", expected, text)
 	}
-	//tag::api2[]
+	// tag::api2[]
 	size := tree.Len()          // 7
 	value, ok := tree.Find('Y') // garbage, false
-	//end::api2[]
+	// end::api2[]
 	if size != 7 {
 		t.Errorf("expected size 7; got %d (%d)", size, value)
 	}
 	if ok {
 		t.Error("expected false; got true")
 	}
-	//tag::api3[]
+	// tag::api3[]
 	value, ok = tree.Find('B') // 5, true
-	//end::api3[]
+	// end::api3[]
 	if !ok || value != 5 {
 		t.Errorf("expected 5, true; got %t, %d", ok, value)
 	}
 	size = tree.Len() // size: 7
-	//tag::api4[]
+	// tag::api4[]
 	deleted := tree.Delete('Y') // false
-	//end::api4[]
+	// end::api4[]
 	if size != 7 {
 		t.Errorf("expected size 7; got %d", size)
 	}
 	if deleted {
 		t.Error("expected false; got true")
 	}
-	//tag::api5[]
+	// tag::api5[]
 	deleted = tree.Delete('B') // true
-	//end::api5[]
+	// end::api5[]
 	if !deleted {
 		t.Error("expected true; got false")
 	}
@@ -65,14 +65,14 @@ func TestAPI(t *testing.T) {
 		t.Errorf("expected 6; got %d", size)
 	}
 	n := 0
-	//tag::api6[]
+	// tag::api6[]
 	for letter := range tree.Keys() { // A E N R S Z
-		//end::api6[]
+		// end::api6[]
 		n += int(letter)
 	}
-	//tag::api7[]
+	// tag::api7[]
 	for value := range tree.Values() { // 7 4 2 6 8 3
-		//end::api7[]
+		// end::api7[]
 		n -= value
 	}
 	tree.Clear()
@@ -87,11 +87,19 @@ func Test1(t *testing.T) {
 		S string
 		I int
 	}{
-		{"can", 3}, {"in", 8}, {"a", 1}, {"ebony", 5}, {"go", 7},
-		{"be", 2}, {"dent", 4}, {"for", 6},
+		{"can", 3},
+		{"in", 8},
+		{"a", 1},
+		{"ebony", 5},
+		{"go", 7},
+		{"be", 2},
+		{"dent", 4},
+		{"for", 6},
 	}
-	expected := []string{"a", "be", "can", "dent", "ebony", "for", "go",
-		"in"}
+	expected := []string{
+		"a", "be", "can", "dent", "ebony", "for", "go",
+		"in",
+	}
 	var tree SortedMap[string, int] // <1>
 	for _, datum := range data {
 		tree.Insert(datum.S, datum.I)
@@ -247,7 +255,6 @@ func BenchmarkMapInsertion(b *testing.B) {
 	for i := range 1000000 {
 		m[i] = i
 	}
-
 }
 
 func BenchmarkMapSortedIteration(b *testing.B) {
@@ -295,10 +302,16 @@ func BenchmarkBTreeIteration(b *testing.B) {
 		panic(total)
 	}
 }
+
 func Test_DeleteValue(t *testing.T) {
 	var tree SortedMap[int, string]
+	var tree2 SortedMap[int, string]
 	for _, n := range []int{9, 1, 8, 2, 7, 3, 6, 4, 5, 0} {
 		tree.Insert(n, strconv.Itoa(n))
+		tree2.Insert(n, strconv.Itoa(n))
+	}
+	if !tree.Equal(tree2) {
+		t.Error("expected equal trees")
 	}
 	for key, value := range tree.All() {
 		k := strconv.Itoa(key)
@@ -309,12 +322,18 @@ func Test_DeleteValue(t *testing.T) {
 	if tree.Len() != 10 {
 		t.Errorf("Len expected 10; got %d", tree.Len())
 	}
-	tree.Delete(99)
+	tree.Delete(99) // should do nothing since 99 not in tree
+	if !tree.Equal(tree2) {
+		t.Error("expected equal trees")
+	}
 	if tree.Len() != 10 {
 		t.Errorf("Len expected 10; got %d", tree.Len())
 	}
 	for _, i := range []int{6, 9, 3, 1} {
 		tree.Delete(i)
+	}
+	if tree.Equal(tree2) {
+		t.Error("expected unequal trees")
 	}
 	if tree.Len() != 6 {
 		t.Errorf("Len expected 6; got %d", tree.Len())
